@@ -3,7 +3,7 @@ title: "WebSocketとは？HTTP通信との違いと使いどころをわかり�
 emoji: "🔌"
 type: "tech"
 topics: ["websocket", "http", "リアルタイム通信", "web開発"]
-published: false
+published: true
 ---
 
 Webアプリにチャットや通知、リアルタイム更新を実装しようとすると、必ず出てくるのが **WebSocket** というキーワード。「HTTPとどう違うの？」「いつ使うべき？」という疑問に、できるだけシンプルに答えます。
