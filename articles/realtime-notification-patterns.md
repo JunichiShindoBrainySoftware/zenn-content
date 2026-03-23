@@ -3,7 +3,7 @@ title: "リアルタイム通知をWebアプリに組み込む方法まとめ"
 emoji: "🔔"
 type: "tech"
 topics: ["websocket", "リアルタイム通信", "web開発", "通知"]
-published: false
+published: true
 ---
 
 「新しいメッセージが届きました」「注文のステータスが更新されました」— こういったリアルタイム通知は、今やWebアプリのユーザー体験に欠かせない要素です。
@@ -100,7 +100,7 @@ source.onerror = () => {
 
 ### デメリット
 - **サーバー→クライアントの一方向のみ。** クライアントからの送信はできない
-- **同時接続数に制限。** HTTP/1.1ではブラウザあたり6接続まで
+- **同時接続数に制限。** HTTP/1.1ではブラウザあたり6接続まで（HTTP/2環境ではこの制限は大幅に緩和されます）
 - **バイナリデータの送信が不可。** テキストのみ
 
 ### 向いているケース
@@ -136,12 +136,12 @@ window.Echo.private(`user.${userId}`)
 - **双方向リアルタイム。** 送信も受信も即座
 - **低レイテンシ。** ミリ秒単位でデータが届く
 - **効率的。** 1本の接続で複数のチャンネルを扱える
-- **SaaSを使えば運用の負荷がゼロ**
+- **SaaSを使えば運用の負荷を大幅に削減**
 
 ### デメリット
 - **自前運用は複雑。** スケーリング、認証、再接続の実装が必要
 - **インフラの設定が必要。** WebSocket対応のロードバランサー、プロキシ
-- **SaaS利用のコスト。** 接続数に応じた月額費用
+- **SaaS利用のコスト。** 接続数に応じた月額費用。ただし自前でのサーバー構築・運用・保守の人件費と比較すると、トータルコストではSaaSの方が安く済むケースも多い
 
 ### 向いているケース
 - チャット、共同編集、オンラインゲームなど双方向通信が必要
@@ -173,9 +173,9 @@ window.Echo.private(`user.${userId}`)
 4. **ユーザー数が多い？運用コストを抑えたい？**
    - → **WebSocket SaaS** の利用を検討
 
-多くのモダンWebアプリでは、最終的にWebSocketに行き着きます。ただし、自前で運用するのは大変なので、PusherやAbly、あるいは私たちが開発している [FluxSocket](https://fluxsocket.com) のようなWebSocket SaaSを利用するのが現実的な選択肢です。
+多くのモダンWebアプリでは、最終的にWebSocketに行き着きます。ただし、自前で運用するのは大変なので、PusherやAblyのようなWebSocket SaaSを利用するのが現実的な選択肢です。
 
-FluxSocketはPusher互換APIで、日本語ドキュメント完備・日本円決済に対応しています。
+私たちが開発している [FluxSocket](https://fluxsocket.com) は、Pusher互換APIで既存コードをほぼそのまま移行でき、日本語ドキュメント完備・日本円決済・国内サーバーによる低レイテンシに対応した国産WebSocket SaaSです。
 
 :::message
 FluxSocketは現在ベータユーザーを募集しています。無料のHobbyプランで気軽にお試しいただけます。
@@ -185,4 +185,4 @@ FluxSocketは現在ベータユーザーを募集しています。無料のHobb
 ## 関連記事
 
 - [WebSocketとは？HTTP通信との違いと使いどころをわかりやすく解説](https://zenn.dev/brainy_software/articles/websocket-vs-http-realtime)
-- [WebSocket SaaSを選ぶときに見るべきポイント](https://zenn.dev/brainy_software/articles/websocket-saas-selection-guide)
+- [Pusherの料金問題と、国産WebSocket SaaSを作った理由](https://zenn.dev/brainy_software/articles/pusher-pricing-and-why-fluxsocket)
