@@ -3,7 +3,7 @@ title: "FluxSocketで作る8つのリアルタイムアプリ — チュート�
 emoji: "⚡"
 type: "tech"
 topics: ["FluxSocket", "WebSocket", "リアルタイム通信", "チュートリアル"]
-published: false
+published: true
 ---
 
 ## このシリーズについて
@@ -23,17 +23,9 @@ published: false
 
 ---
 
-## まずはこちら: 準備編
-
-https://zenn.dev/brainy_software/articles/fluxsocket-tutorial-setup
-
-すべてのチュートリアルの前提となる **共通セットアップ** です。FluxSocket のアカウント作成、アプリキー取得、クライアント・サーバー双方の基本的な接続方法を解説しています。
-
-**所要時間: 約 5 分**
-
-まだ FluxSocket のアカウントをお持ちでない方は、こちらから始めてください。
-
----
+:::message
+共通セットアップ手順（準備編）は近日公開予定です。
+:::
 
 ## チュートリアル一覧
 
