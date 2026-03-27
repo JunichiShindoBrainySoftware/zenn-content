@@ -3,7 +3,7 @@ title: "WebSocket SaaSを選ぶときに見るべきポイント"
 emoji: "🔍"
 type: "tech"
 topics: ["websocket", "SaaS", "技術選定", "インフラ"]
-published: false
+published: true
 ---
 
 WebSocketをプロダクションで使うなら、自前で運用するかSaaSに任せるかの判断が必要です。そしてSaaSを使うと決めたら、次は「どのSaaSを選ぶか」という問題に直面します。
