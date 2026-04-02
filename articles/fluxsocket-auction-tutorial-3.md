@@ -1,6 +1,6 @@
 ---
-title: "React + Express で作るリアルタイムオークション — 入札が全員に即座に届く仕組み"
-emoji: "🏺"
+title: "FluxSocketでリアルタイム化する — 入札が全員に即座に届く"
+emoji: "⚡"
 type: "tech"
 topics: ["FluxSocket", "React", "WebSocket", "リアルタイム", "Node.js"]
 published: false
@@ -8,14 +8,13 @@ published: false
 
 ## はじめに
 
-「オークションサイトで入札したのに、更新ボタンを押すまで最新価格が分からない」 — そんな体験をしたことはないでしょうか。
+[前回の記事](https://zenn.dev/brainy_software/articles/fluxsocket-auction-tutorial-2)では、ポーリングで自動更新を実現しましたが、遅延と無駄なリクエストという問題が残りました。
 
-リアルタイム入札は、ECやオークション系サービスだけでなく、社内のリソース予約やイベントのチケット争奪など、**「同時に複数人が同じ対象に対してアクションする」**場面で広く必要とされます。しかしいざ実装しようとすると、WebSocket サーバーの構築・運用・スケーリングが課題になりがちです。
+今回は、ポーリングの `setInterval` を削除し、代わりに **FluxSocket**（Pusher互換の WebSocket SaaS）を導入します。サーバーから全クライアントにイベントをプッシュすることで、入札が即座に全員の画面に反映される体験を実現します。
 
-この記事では、**React 18 + Express + FluxSocket** を使って、入札が全員にリアルタイムで届くオークションアプリを構築します。FluxSocket は Pusher 互換の WebSocket SaaS なので、`pusher-js` ライブラリをそのまま使えます。WebSocket のインフラを自前で管理する必要がありません。
-
-完成デモはこちらで触れます。
 **デモ:** [https://auction-demo.fluxsocket.com](https://auction-demo.fluxsocket.com)
+
+複数のタブやデバイスで開いて、入札がリアルタイムに同期される様子を確かめてみてください。
 
 ### この記事で学べること
 
@@ -26,27 +25,13 @@ published: false
 
 ### 対象読者
 
-- React の基本文法（`useState`, `useEffect`）を知っている方
-- リアルタイム機能を Web アプリに追加してみたい方
+- [前回までの記事](https://zenn.dev/brainy_software/articles/fluxsocket-auction-tutorial-2)のコードが手元にある方
 - WebSocket を使いたいが、インフラの構築・運用は避けたい方
+- Pusher 互換の API に興味がある方
 
 ---
 
-## 技術スタック
-
-| 技術 | 役割 |
-|------|------|
-| **React 18**（CDN版） | フロントエンドの入札UI |
-| **Express** | API サーバー + Presence Channel 認証 |
-| **pusher-js** | FluxSocket への WebSocket 接続 |
-| **Tailwind CSS**（CDN版） | スタイリング |
-| **FluxSocket** | リアルタイム通信基盤（Pusher互換 SaaS） |
-
-今回はビルドツールなしの構成です。CDN から React と Tailwind を読み込むので、`npm install` してすぐに動かせます。
-
----
-
-## Step 1: FluxSocket の準備
+## FluxSocket の準備
 
 FluxSocket でアプリを作成し、接続情報を取得します。
 
@@ -58,17 +43,7 @@ FluxSocket でアプリを作成し、接続情報を取得します。
    - **Secret**
    - **Host**
 
----
-
-## Step 2: プロジェクトのセットアップ
-
-```bash
-mkdir auction-app && cd auction-app
-npm init -y
-npm install express dotenv
-```
-
-`.env` ファイルを作成して、先ほど控えた接続情報を設定します。
+`.env` ファイルに追記します。
 
 ```env
 FLUX_APP_ID=your-app-id
@@ -80,46 +55,19 @@ FLUX_USE_TLS=true
 SERVER_PORT=3000
 ```
 
-プロジェクト構成はシンプルです。
-
-```
-auction-app/
-├── server.js          # Express サーバー
-├── public/
-│   └── index.html     # React オークションUI
-├── .env
-└── package.json
-```
-
 ---
 
-## Step 3: サーバー実装
+## Step 1: サーバーにイベント発火機能を追加
 
-`server.js` を作成します。主な役割は3つです。
+前回までのサーバーには、入札を受け付ける API はありましたが、「他のクライアントに通知する」仕組みがありませんでした。ここに FluxSocket へのイベント発火を追加します。
 
-1. **アイテムデータの管理**（今回はインメモリ）
-2. **入札 API** — 入札を受け付けて FluxSocket にイベントを発火
-3. **チャネル認証** — Presence Channel の認証エンドポイント
-
-### FluxSocket へのイベント発火
-
-FluxSocket は Pusher 互換の HTTP API を持っています。サーバーから直接 HTTP リクエストを送ってイベントを発火できます。
+### FluxSocket API でイベントを送信する関数
 
 ```js
-require('dotenv').config();
-const express = require('express');
-const path = require('path');
 const crypto = require('crypto');
-
-const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
-
 const key = process.env.FLUX_APP_KEY;
 const secret = process.env.FLUX_APP_SECRET;
 
-// FluxSocket API でイベントを発火する関数
 function triggerEvent(channel, event, data) {
     const body = JSON.stringify({
         name: event,
@@ -148,43 +96,17 @@ function triggerEvent(channel, event, data) {
 }
 ```
 
-HMAC-SHA256 で署名した HTTP リクエストを FluxSocket に送ります。この部分は Pusher の HTTP API と完全に同じ仕様です。`pusher` サーバー SDK を使えばこの署名処理を省略できますが、今回は仕組みを理解するために手動で実装しています。
+HMAC-SHA256 で署名した HTTP リクエストを FluxSocket に送ります。この部分は Pusher の HTTP API と完全に同じ仕様です。
 
 :::message
-本番環境では `pusher` npm パッケージを使うのが良いかもしれません。署名処理を自前で書く必要がなくなります。
+`pusher` npm パッケージを使えばこの署名処理を省略できます。今回は仕組みを理解するために手動で実装していますが、本番環境では SDK を使うのが良いかもしれません。
 :::
 
-### オークションアイテムと入札 API
+### 入札 API にイベント発火を追加
+
+前回の入札エンドポイントに、`triggerEvent` の呼び出しを1行追加します。
 
 ```js
-// オークションアイテム（インメモリ）
-const items = [
-    {
-        id: 'item-1',
-        name: 'ヴィンテージ腕時計',
-        image: '⌚',
-        description: '1960年代の希少な機械式腕時計',
-        startPrice: 50000,
-        currentBid: 50000,
-        bidder: null,
-        bidCount: 0,
-        endsAt: Date.now() + 24 * 60 * 60 * 1000, // 24時間後
-    },
-    // ... 他のアイテムも同様に定義
-];
-
-// 設定を返す API（フロントエンドが WebSocket 接続に使用）
-app.get('/api/config', (req, res) => res.json({
-    key,
-    host: process.env.FLUX_HOST,
-    port: parseInt(process.env.FLUX_PORT || '443'),
-    forceTLS: process.env.FLUX_USE_TLS === 'true',
-}));
-
-// アイテム一覧
-app.get('/api/items', (req, res) => res.json(items));
-
-// 入札エンドポイント
 app.post('/api/items/:id/bid', (req, res) => {
     const item = items.find(i => i.id === req.params.id);
     if (!item) return res.status(404).json({ error: 'アイテムが見つかりません' });
@@ -192,17 +114,14 @@ app.post('/api/items/:id/bid', (req, res) => {
 
     const { amount, userName } = req.body;
     if (!amount || amount <= item.currentBid) {
-        return res.status(400).json({
-            error: `¥${(item.currentBid + 1000).toLocaleString()} 以上で入札してください`,
-        });
+        return res.status(400).json({ error: `¥${(item.currentBid + 1000).toLocaleString()} 以上で入札してください` });
     }
 
-    // 入札を反映
     item.currentBid = amount;
     item.bidder = userName;
     item.bidCount++;
 
-    // FluxSocket で全員に通知
+    // 【追加】FluxSocket で全員に通知
     triggerEvent('auction', 'bid-placed', {
         itemId: item.id,
         currentBid: item.currentBid,
@@ -214,11 +133,22 @@ app.post('/api/items/:id/bid', (req, res) => {
 });
 ```
 
-ポイントは `triggerEvent('auction', 'bid-placed', ...)` の部分です。入札が成功すると、`auction` チャネルに `bid-placed` イベントを発火します。このチャネルを購読している全クライアントに、入札情報がリアルタイムで届きます。
+`triggerEvent('auction', 'bid-placed', ...)` — この1行が、入札情報を `auction` チャネルの全購読者にブロードキャストします。
 
-### Presence Channel の認証エンドポイント
+### 設定 API と認証エンドポイントの追加
+
+フロントエンドが WebSocket に接続するための設定 API と、Presence Channel の認証エンドポイントを追加します。
 
 ```js
+// フロントエンドに接続情報を渡す
+app.get('/api/config', (req, res) => res.json({
+    key,
+    host: process.env.FLUX_HOST || 'localhost',
+    port: parseInt(process.env.FLUX_PORT || '443'),
+    forceTLS: process.env.FLUX_USE_TLS === 'true',
+}));
+
+// Presence Channel の認証エンドポイント
 app.post('/auth/channel', (req, res) => {
     const { socket_id, channel_name } = req.body;
     const userName = req.body.user_name || 'Guest';
@@ -249,27 +179,31 @@ app.post('/auth/channel', (req, res) => {
         .digest('hex');
     res.json({ auth: `${key}:${signature}` });
 });
-
-const PORT = process.env.SERVER_PORT || 3000;
-app.listen(PORT, () => console.log(`Auction: http://localhost:${PORT}`));
 ```
 
 Presence Channel では、ユーザー ID と名前を含めた `channel_data` を返します。これにより FluxSocket が「誰がこのチャネルにいるか」を管理してくれます。
 
 ---
 
-## Step 4: フロントエンド実装
+## Step 2: フロントエンドで WebSocket を接続
 
-`public/index.html` を作成します。React 18 を CDN から読み込み、Babel でブラウザ内トランスパイルします。
+HTML の `<head>` に pusher-js を追加します。
 
-### WebSocket 接続と入札イベントの受信
+```html
+<script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+```
+
+FluxSocket は Pusher 互換なので、`pusher-js` ライブラリがそのまま使えます。
+
+### ポーリングを削除し、WebSocket 接続に置き換える
+
+前回の `App` コンポーネントを修正します。ポーリングの `setInterval` を削除し、代わりに FluxSocket への接続とイベント受信を実装します。
 
 ```jsx
-const { useState, useEffect, useRef, useCallback } = React;
-
 function App() {
     const [userName, setUserName] = useState(null);
     const [items, setItems] = useState([]);
+    const [bidItem, setBidItem] = useState(null);
     const [flashIds, setFlashIds] = useState(new Set());
     const [connected, setConnected] = useState(false);
     const [watchers, setWatchers] = useState(0);
@@ -303,33 +237,36 @@ function App() {
         });
         pusherRef.current = pusher;
 
+        // 接続状態の管理
         pusher.connection.bind('connected', () => setConnected(true));
         pusher.connection.bind('disconnected', () => setConnected(false));
 
         // --- Public Channel: 入札イベントの受信 ---
         const auctionCh = pusher.subscribe('auction');
         auctionCh.bind('bid-placed', (data) => {
+            // 該当アイテムの state を更新
             setItems(prev => prev.map(item =>
                 item.id === data.itemId
                     ? { ...item, currentBid: data.currentBid, bidder: data.bidder, bidCount: data.bidCount }
                     : item
             ));
-            // 入札されたカードをハイライト
+            // フラッシュエフェクト（1秒間ハイライト）
             setFlashIds(prev => new Set([...prev, data.itemId]));
-            setTimeout(() => {
-                setFlashIds(prev => {
-                    const s = new Set(prev);
-                    s.delete(data.itemId);
-                    return s;
-                });
-            }, 1000);
+            setTimeout(() => setFlashIds(prev => {
+                const s = new Set(prev);
+                s.delete(data.itemId);
+                return s;
+            }), 1000);
+            // 最近の入札リストに追加
+            setRecentBids(prev => [
+                { itemId: data.itemId, bidder: data.bidder, amount: data.currentBid, time: Date.now() },
+                ...prev.slice(0, 4),
+            ]);
         });
 
         // --- Presence Channel: 閲覧者数の表示 ---
         const presenceCh = pusher.subscribe('presence-auction');
-        presenceCh.bind('pusher:subscription_succeeded', (members) => {
-            setWatchers(members.count);
-        });
+        presenceCh.bind('pusher:subscription_succeeded', (members) => setWatchers(members.count));
         presenceCh.bind('pusher:member_added', () => setWatchers(w => w + 1));
         presenceCh.bind('pusher:member_removed', () => setWatchers(w => Math.max(0, w - 1)));
     }, []);
@@ -346,71 +283,67 @@ function App() {
 **Presence Channel（`presence-auction`）**
 認証が必要なチャネルで、「誰が今このチャネルにいるか」を FluxSocket が管理してくれます。`pusher:subscription_succeeded` でチャネル参加時の人数を取得し、`pusher:member_added` / `pusher:member_removed` で増減を反映します。ヘッダーの「N 人が閲覧中」の表示に使っています。
 
-### 入札 UI
+### UI に閲覧者数とフラッシュエフェクトを追加
 
-入札モーダルでは、最低入札額を自動計算して3つのプリセットボタンを表示しています。
+ヘッダーに接続状態と閲覧者数を表示します。
 
 ```jsx
-function BidModal({ item, userName, onBid, onClose }) {
-    const minBid = item.currentBid + 1000;
-    const [amount, setAmount] = useState(minBid);
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
+<div className="flex items-center gap-4">
+    <span className="text-sm text-gray-500">👁 {watchers} 人が閲覧中</span>
+    <span className="text-sm text-gray-600 font-medium">{userName}</span>
+    <span className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500' : 'bg-red-500'}`}></span>
+</div>
+```
 
-    const submit = async () => {
-        setLoading(true);
-        setError('');
-        try {
-            const res = await fetch(`/api/items/${item.id}/bid`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount, userName }),
-            });
-            const data = await res.json();
-            if (!res.ok) { setError(data.error); setLoading(false); return; }
-            onBid(data);
-            onClose();
-        } catch { setError('通信エラー'); setLoading(false); }
-    };
+商品カードにフラッシュエフェクトの props を追加します。
 
+```jsx
+function ItemCard({ item, onBidClick, flash }) {
+    // ...
     return (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-6 w-96 shadow-2xl">
-                <h3 className="text-lg font-bold">{item.image} {item.name}</h3>
-                <p className="text-sm text-gray-500 mb-4">
-                    現在の最高入札:
-                    <span className="font-bold text-indigo-600">
-                        ¥{item.currentBid.toLocaleString()}
-                    </span>
-                </p>
-                {/* プリセットボタン: +1,000 / +6,000 / +11,000 */}
-                <div className="flex gap-2 mb-2">
-                    {[minBid, minBid + 5000, minBid + 10000].map(v => (
-                        <button key={v} onClick={() => setAmount(v)}
-                            className={`flex-1 py-2 rounded-lg text-sm font-bold
-                                ${amount === v
-                                    ? 'bg-indigo-600 text-white'
-                                    : 'bg-gray-100 text-gray-700'}`}>
-                            ¥{v.toLocaleString()}
-                        </button>
-                    ))}
-                </div>
-                {error && <p className="text-red-500 text-sm">{error}</p>}
-                <button onClick={submit} disabled={loading}
-                    className="w-full py-2 bg-indigo-600 text-white font-bold rounded-lg">
-                    {loading ? '送信中...' : `¥${amount.toLocaleString()} で入札`}
-                </button>
-            </div>
+        <div className={`bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden
+            transition-all duration-300 ${flash ? 'ring-2 ring-indigo-400 scale-[1.02]' : ''}`}>
+            {/* ... */}
         </div>
     );
 }
 ```
 
-入札 API はシンプルな POST リクエストです。成功するとサーバー側で `triggerEvent` が呼ばれ、**入札した本人も含めた全員に** `bid-placed` イベントが配信されます。
+入札が入るとカードが一瞬拡大してインディゴ色のリングが表示されます。どのアイテムに入札があったのか視覚的に分かりやすくなります。
+
+### サイドバーに最近の入札を表示
+
+```jsx
+<div className="lg:col-span-1">
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sticky top-20">
+        <h2 className="font-bold text-gray-900 mb-3">最近の入札</h2>
+        {recentBids.length === 0 ? (
+            <p className="text-sm text-gray-400">まだ入札がありません</p>
+        ) : (
+            <div className="space-y-3">
+                {recentBids.map((bid, i) => {
+                    const item = items.find(it => it.id === bid.itemId);
+                    return (
+                        <div key={i} className="flex items-center gap-3 text-sm">
+                            <span className="text-xl">{item?.image || '📦'}</span>
+                            <div className="flex-1 min-w-0">
+                                <p className="font-medium text-gray-800 truncate">{bid.bidder}</p>
+                                <p className="text-indigo-600 font-bold">{formatPrice(bid.amount)}</p>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        )}
+    </div>
+</div>
+```
+
+WebSocket でイベントを受信するたびに `recentBids` に追加されるので、サイドバーがリアルタイムで更新されます。
 
 ---
 
-## Step 5: 動作確認
+## Step 3: 動作確認
 
 サーバーを起動して、複数タブで動かしてみます。
 
@@ -422,17 +355,17 @@ node server.js
 
 1. **タブ A** で名前を入力して参加
 2. **タブ B** で別の名前を入力して参加 — ヘッダーの閲覧者数が「2 人が閲覧中」に増える
-3. タブ A でアイテムに入札 — **タブ B にもリアルタイムで入札が反映**される
+3. タブ A でアイテムに入札 — **タブ B にも即座に入札が反映**される
 4. 入札されたカードが一瞬ハイライト（フラッシュエフェクト）
 5. サイドバーの「最近の入札」にも即座に表示される
 
-リロード不要で全員の画面が同期される体験を確認できるかと思います。
+ポーリング版と比べて、遅延がほぼゼロになっていることを体感できるかと思います。
 
 ---
 
 ## 処理の流れを整理する
 
-入札からリアルタイム更新までの流れを図で整理しておきます。
+入札からリアルタイム更新までの全体の流れです。
 
 ```
 ユーザーA（入札）                     サーバー（Express）              FluxSocket
@@ -453,7 +386,19 @@ node server.js
 3. FluxSocket が `auction` チャネルの全購読者に WebSocket でイベントを配信
 4. 各クライアントの React が `bid-placed` イベントを受け取り、state を更新
 
-サーバーは「イベントを発火する」だけ。WebSocket の接続管理やメッセージのルーティングは全て FluxSocket が担当してくれます。
+サーバーは「イベントを発火する」だけ。WebSocket の接続管理やメッセージのルーティングは全て FluxSocket が担当してくれます。ポーリングのように無駄なリクエストも発生しません。
+
+---
+
+## ポーリング版との比較
+
+| 項目 | ポーリング（前回） | WebSocket（今回） |
+|:---|:---|:---|
+| 更新の遅延 | 最大3秒（間隔に依存） | ほぼゼロ |
+| 無駄なリクエスト | 毎回発生 | なし（イベント駆動） |
+| サーバー負荷 | ユーザー数 x リクエスト/分 | イベント発生時のみ |
+| 閲覧者数の表示 | 実装困難 | Presence Channel で簡単 |
+| 入札の視覚フィードバック | 難しい | フラッシュエフェクトで即座に |
 
 ---
 
@@ -473,18 +418,21 @@ node server.js
 
 ## まとめ
 
-この記事では、React + Express + FluxSocket を使って、リアルタイムオークションアプリを構築しました。
+3本の記事を通して、オークションアプリの進化を段階的に体験してきました。
 
-**実装した機能:**
+| 記事 | 方式 | 体験 |
+|:---|:---|:---|
+| 第1回 | 手動リロード | 他の人の入札が見えない |
+| 第2回 | ポーリング | 自動更新されるが遅延あり・無駄なリクエスト |
+| **第3回** | **WebSocket（FluxSocket）** | **即座に反映・無駄なし・閲覧者数も表示** |
 
-- Public Channel による入札のリアルタイムブロードキャスト
-- Presence Channel による「N 人が閲覧中」表示
-- フラッシュエフェクトによる入札の視覚フィードバック
-- 最近の入札履歴のリアルタイム表示
+FluxSocket は Pusher 互換なので、`pusher-js` をそのまま使えます。WebSocket のインフラ構築や接続管理を自前で行う必要がなく、チャネルを購読してサーバーから HTTP でイベントを発火する — というシンプルなパターンでリアルタイム機能を実現できます。
 
-WebSocket のインフラ構築や接続管理を自前で行う必要がなく、`pusher-js` を使ってチャネルを購読し、サーバーから HTTP でイベントを発火する — というシンプルなパターンでリアルタイム機能を実現できることを体感いただけたのではないかと思います。
+**3つのデモを比較してみる:**
 
-**デモを触ってみる:** [https://auction-demo.fluxsocket.com](https://auction-demo.fluxsocket.com)
+- [手動リロード版](https://auction-static-demo.fluxsocket.com)
+- [ポーリング版](https://auction-polling-demo.fluxsocket.com)
+- [WebSocket版](https://auction-demo.fluxsocket.com)
 
 :::message
 FluxSocket は現在ベータユーザーを募集しています。無料の Hobby プランで気軽にお試しいただけます。
@@ -493,6 +441,7 @@ FluxSocket は現在ベータユーザーを募集しています。無料の Ho
 
 ## 関連記事
 
+- [手動リロード vs ポーリング vs WebSocket — オークションアプリで体感する3つのリアルタイム実装](https://zenn.dev/brainy_software/articles/fluxsocket-auction-comparison)
 - [FluxSocket で作る 8 つのリアルタイムアプリ — チュートリアル完全ガイド](https://zenn.dev/brainy_software/articles/fluxsocket-tutorial-index)
 - [FluxSocket でリアルタイムチャットを実装する](https://zenn.dev/brainy_software/articles/fluxsocket-chat-tutorial)
 - [WebSocket とは？HTTP 通信との違いと使いどころをわかりやすく解説](https://zenn.dev/brainy_software/articles/websocket-vs-http-realtime)

@@ -47,20 +47,22 @@ Laravel の Broadcasting 機能と FluxSocket を組み合わせて、リアル�
 
 ---
 
-### 2. React でリアルタイムオークションを作る（全 2 回）
+### 2. React でリアルタイムオークションを作る（全 3 回 + 比較記事）
 
 | 項目 | 内容 |
 |------|------|
 | **技術スタック** | React 18 + Express |
-| **FluxSocket 機能** | Private Channel, Presence Channel, Server Trigger |
+| **FluxSocket 機能** | Public Channel, Presence Channel, Server Trigger |
 | **難易度** | ⭐⭐ 中級 |
 
-入札のリアルタイム更新と、「今誰が見ているか」の Presence 表示を実装します。認証付きチャネルの使い方を学ぶのに最適です。
+手動リロード → ポーリング → WebSocket と段階的にオークションアプリを進化させ、リアルタイム通信の価値を体感するシリーズです。
 
 | # | タイトル | 状態 |
 |---|---------|------|
-| ① | 商品一覧 + 入札 API | 近日公開 |
-| ② | Presence + UI 仕上げ | 近日公開 |
+| ① | [React + ExpressでオークションWebアプリを作る](https://zenn.dev/brainy_software/articles/fluxsocket-auction-tutorial-1) | 近日公開 |
+| ② | [ポーリングで自動更新する — そのメリットと限界](https://zenn.dev/brainy_software/articles/fluxsocket-auction-tutorial-2) | 近日公開 |
+| ③ | [FluxSocketでリアルタイム化する — 入札が全員に即座に届く](https://zenn.dev/brainy_software/articles/fluxsocket-auction-tutorial-3) | 近日公開 |
+| 比較 | [手動リロード vs ポーリング vs WebSocket — 3つのリアルタイム実装を比較](https://zenn.dev/brainy_software/articles/fluxsocket-auction-comparison) | 近日公開 |
 
 ---
 
