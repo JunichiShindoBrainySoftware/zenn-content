@@ -1,5 +1,5 @@
 ---
-title: "リアルタイム通知でタスクボードをフリーズさせた話 — WebSocket大量受信時のDOM更新設計"
+title: "WebSocket通知5件でフリーズ、15件でクラッシュした話 — リアルタイムUIの落とし穴と対処法"
 emoji: "🧊"
 type: "tech"
 topics: ["FluxSocket", "WebSocket", "パフォーマンス", "JavaScript", "リアルタイム"]
