@@ -229,7 +229,7 @@ function App() {
             wsPort: config.port,
             wssPort: config.port,
             forceTLS: config.forceTLS || false,
-            enabledTransports: ['ws', 'wss'],
+            enabledTransports: ['ws'],
             cluster: 'mt1',
             disableStats: true,
             authEndpoint: '/auth/channel',
@@ -394,7 +394,7 @@ node server.js
 
 | 項目 | ポーリング（前回） | WebSocket（今回） |
 |:---|:---|:---|
-| 更新の遅延 | 最大3秒（間隔に依存） | ほぼゼロ |
+| 更新の遅延 | 最大30秒（間隔に依存） | ほぼゼロ |
 | 無駄なリクエスト | 毎回発生 | なし（イベント駆動） |
 | サーバー負荷 | ユーザー数 x リクエスト/分 | イベント発生時のみ |
 | 閲覧者数の表示 | 実装困難 | Presence Channel で簡単 |

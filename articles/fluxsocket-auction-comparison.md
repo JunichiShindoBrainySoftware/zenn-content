@@ -21,7 +21,7 @@ published: false
 | 方式 | デモ |
 |:---|:---|
 | 手動リロード | [auction-static-demo.fluxsocket.com](https://auction-static-demo.fluxsocket.com) |
-| ポーリング（3秒間隔） | [auction-polling-demo.fluxsocket.com](https://auction-polling-demo.fluxsocket.com) |
+| ポーリング（30秒間隔） | [auction-polling-demo.fluxsocket.com](https://auction-polling-demo.fluxsocket.com) |
 | WebSocket（FluxSocket） | [auction-demo.fluxsocket.com](https://auction-demo.fluxsocket.com) |
 
 それぞれの詳しい実装手順は、チュートリアルシリーズで解説しています。
@@ -95,8 +95,8 @@ WebSocket 接続を常時維持し、サーバー側で変化があったとき�
 
 | 項目 | 手動リロード | ポーリング | WebSocket |
 |:---|:---|:---|:---|
-| **更新のタイミング** | ユーザーがリロードした時 | 設定間隔ごと（例: 3秒） | イベント発生時に即座 |
-| **遅延** | ユーザー操作に依存 | 最大で間隔分（例: 最大3秒） | ほぼゼロ |
+| **更新のタイミング** | ユーザーがリロードした時 | 設定間隔ごと（例: 30秒） | イベント発生時に即座 |
+| **遅延** | ユーザー操作に依存 | 最大で間隔分（例: 最大30秒） | ほぼゼロ |
 | **無駄なリクエスト** | なし | 多い（変化がなくても毎回） | なし（イベント駆動） |
 | **サーバー負荷** | 低い | ユーザー数に比例して増加 | イベント発生時のみ |
 | **実装の難易度** | 最も簡単 | 簡単（setInterval） | やや複雑（接続管理・認証） |
