@@ -32,55 +32,59 @@ published: false
 
 ### 方式1: 手動リロード
 
-```
-クライアントA（入札）          サーバー              クライアントB
-    |                           |                       |
-    |-- POST（入札）----------->|                       |
-    |<-- 200 OK（結果）---------|                       |
-    |                           |                       |
-    |   Aの画面は更新される      |   Bは何も知らない      |
-    |                           |                       |
-    |                           |   Bがリロード          |
-    |                           |<-- GET /api/items ----|
-    |                           |--- 200 OK ----------->|
-    |                           |                       |
-    |                           |   ようやくBに反映      |
+```mermaid
+sequenceDiagram
+    participant A as Client A (Bidder)
+    participant S as Server
+    participant B as Client B
+
+    A->>S: POST /bid
+    S-->>A: 200 OK
+    Note over A: A's screen updates
+    Note over B: B sees nothing
+    B->>S: Reload (GET /api/items)
+    S-->>B: 200 OK
+    Note over B: Finally updates
 ```
 
 最もシンプルな方式です。クライアントがデータを取りに行かない限り、画面は更新されません。
 
 ### 方式2: ポーリング
 
-```
-クライアントA（入札）          サーバー              クライアントB
-    |                           |                       |
-    |                           |<-- GET（ポーリング）---|  変化なし
-    |                           |--- 200 OK ----------->|
-    |                           |                       |
-    |-- POST（入札）----------->|                       |
-    |<-- 200 OK（結果）---------|                       |
-    |                           |                       |
-    |                           |<-- GET（ポーリング）---|  変化なし
-    |                           |--- 200 OK ----------->|
-    |                           |                       |
-    |                           |<-- GET（ポーリング）---|  ここで反映
-    |                           |--- 200 OK ----------->|
+```mermaid
+sequenceDiagram
+    participant A as Client A (Bidder)
+    participant S as Server
+    participant B as Client B
+
+    B->>S: GET /api/items (polling)
+    S-->>B: 200 OK (no change)
+    A->>S: POST /bid
+    S-->>A: 200 OK
+    B->>S: GET /api/items (polling)
+    S-->>B: 200 OK (no change)
+    B->>S: GET /api/items (polling)
+    S-->>B: 200 OK (updated!)
+    Note over B: Delayed update
 ```
 
 一定間隔でサーバーにデータを取りに行きます。データに変化がなくてもリクエストは毎回発生します。
 
 ### 方式3: WebSocket
 
-```
-クライアントA（入札）          サーバー          FluxSocket        クライアントB
-    |                           |                 |                    |
-    |                           |     WebSocket接続（常時維持）         |
-    |                           |                 |<===== 接続 =======>|
-    |                           |                 |                    |
-    |-- POST（入札）----------->|                 |                    |
-    |                           |-- イベント発火 ->|                    |
-    |                           |                 |--- Push ---------> |
-    |<-- Push ------------------|--- broadcast ---|    即座に反映       |
+```mermaid
+sequenceDiagram
+    participant A as Client A (Bidder)
+    participant S as Server
+    participant F as FluxSocket
+    participant B as Client B
+
+    Note over F,B: WebSocket connection (persistent)
+    A->>S: POST /bid
+    S->>F: Trigger event
+    F-->>B: Push (instant)
+    F-->>A: Push (instant)
+    Note over A,B: Both update immediately
 ```
 
 WebSocket 接続を常時維持し、サーバー側で変化があったときだけクライアントにプッシュします。クライアントがデータを「取りに行く」のではなく、サーバーから「届く」形です。
