@@ -3,7 +3,7 @@ title: "手動リロード vs ポーリング vs WebSocket — オークショ�
 emoji: "⚖️"
 type: "idea"
 topics: ["WebSocket", "ポーリング", "リアルタイム", "FluxSocket", "設計"]
-published: false
+published: true
 ---
 
 ## はじめに
