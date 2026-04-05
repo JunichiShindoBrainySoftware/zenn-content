@@ -24,11 +24,7 @@ published: false
 | ポーリング（30秒間隔） | [auction-polling-demo.fluxsocket.com](https://auction-polling-demo.fluxsocket.com) |
 | WebSocket（FluxSocket） | [auction-demo.fluxsocket.com](https://auction-demo.fluxsocket.com) |
 
-それぞれの詳しい実装手順は、チュートリアルシリーズで解説しています。
-
-- [第1回: React + ExpressでオークションWebアプリを作る](https://zenn.dev/brainy_software/articles/fluxsocket-auction-tutorial-1)
-- [第2回: ポーリングで自動更新する — そのメリットと限界](https://zenn.dev/brainy_software/articles/fluxsocket-auction-tutorial-2)
-- [第3回: FluxSocketでリアルタイム化する — 入札が全員に即座に届く](https://zenn.dev/brainy_software/articles/fluxsocket-auction-tutorial-3)
+それぞれの詳しい実装手順は、チュートリアルシリーズで順次公開予定です。
 
 ---
 
@@ -225,21 +221,9 @@ FluxSocket は Pusher 互換なので、Pusher のクライアントライブラ
 
 ---
 
-## 他のリアルタイムデモを試してみる
+## 他のリアルタイムデモ
 
-オークション以外にも、さまざまなリアルタイムアプリのデモを公開しています。
-
-| デモ | 使用チャネル | 体験できること |
-|:---|:---|:---|
-| [チャット](https://chat-demo.fluxsocket.com) | Public Channel | メッセージのリアルタイム送受信 |
-| [カーソル共有](https://cursors-demo.fluxsocket.com) | Presence + Client Events | Figma 風のカーソル共有 |
-| [ライブ投票](https://voting-demo.fluxsocket.com) | Public Channel | 投票結果のリアルタイム集計 |
-| [ダッシュボード](https://dashboard-demo.fluxsocket.com) | Public Channel | サーバーメトリクスのライブ表示 |
-| [タスクボード](https://taskboard-demo.fluxsocket.com) | Presence + Client Events | 共同タスク管理 |
-| [SNS フィード](https://livefeed-demo.fluxsocket.com) | Public + Presence | リアルタイム投稿フィード |
-| [通知](https://notifications-demo.fluxsocket.com) | Private Channel | ユーザー別リアルタイム通知 |
-
-各デモのチュートリアルは [FluxSocket チュートリアル完全ガイド](https://zenn.dev/brainy_software/articles/fluxsocket-tutorial-index) にまとめています。
+オークション以外にも、チャット・カーソル共有・ライブ投票・ダッシュボードなど、さまざまなリアルタイムアプリのデモを準備中です。順次公開予定ですので、お楽しみに。
 
 :::message
 FluxSocket は現在ベータユーザーを募集しています。無料の Hobby プランで気軽にお試しいただけます。
@@ -248,6 +232,5 @@ FluxSocket は現在ベータユーザーを募集しています。無料の Ho
 
 ## 関連記事
 
-- [FluxSocket で作る 8 つのリアルタイムアプリ — チュートリアル完全ガイド](https://zenn.dev/brainy_software/articles/fluxsocket-tutorial-index)
 - [Pusher の料金問題と、国産 WebSocket SaaS を作った理由](https://zenn.dev/brainy_software/articles/pusher-pricing-and-why-fluxsocket)
 - [WebSocket とは？HTTP 通信との違いと使いどころをわかりやすく解説](https://zenn.dev/brainy_software/articles/websocket-vs-http-realtime)
