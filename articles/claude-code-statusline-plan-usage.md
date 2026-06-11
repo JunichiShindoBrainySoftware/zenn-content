@@ -3,7 +3,7 @@ title: "Claude Code のステータス行に「プラン利用枠」を映す �
 emoji: "📊"
 type: "tech"
 topics: ["ClaudeCode", "Anthropic", "CLI", "生産性", "Tips"]
-published: false
+published: true
 ---
 
 ## はじめに
