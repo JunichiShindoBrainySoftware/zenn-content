@@ -3,7 +3,7 @@ title: "Claude CodeがVPN接続中に「Connection closed mid-response」で切�
 emoji: "🛜"
 type: "tech"
 topics: ["claudecode", "vpn", "nordvpn", "mtu", "ネットワーク"]
-published: false
+published: true
 ---
 
 ## はじめに
