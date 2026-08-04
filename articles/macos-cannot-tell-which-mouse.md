@@ -3,7 +3,7 @@ title: "macOS は「どのマウスのボタンか」を教えてくれない"
 emoji: "🖱"
 type: "tech"
 topics: ["macos", "swift", "hid", "iokit", "coregraphics"]
-published: false
+published: true
 ---
 
 マウスを2台使っている。デスクではトラックボール、持ち歩くときは小さいマウス。
