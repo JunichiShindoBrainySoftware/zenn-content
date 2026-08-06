@@ -136,7 +136,13 @@ let bundleId = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
 
 **権限を2つ取る。**`CGEventTap` を張るには**入力監視**、他のアプリにイベントを送るには**アクセシビリティ**が要る。macOS の許可の仕組みを **TCC**（Transparency, Consent, and Control）と呼ぶ。
 
-ここには実装上の罠がある。`AXIsProcessTrusted()` と `CGPreflightPostEventAccess()` は**プロセスごとにキャッシュされる**。初回呼び出しでキャッシュが埋まり、**起動後に許可を与えても false を返し続ける**。変更を知らせる通知 API も無い（Apple Developer Forums の 727984・744440 に同じ症状の報告がある）。
+ここには実装上の罠がある。`AXIsProcessTrusted()` と `CGPreflightPostEventAccess()` は**プロセスごとにキャッシュされる**。初回呼び出しでキャッシュが埋まり、**起動後に許可を与えても false を返し続ける。**
+
+これは手元だけの話ではない。Apple Developer Forums の [727984](https://developer.apple.com/forums/thread/727984) に、同じ症状がそのまま報告されている。
+
+> `CGPreflightPostEventAccess` が false を返したあと、アプリを動かしたまま設定で許可を与えて戻ってきても、**まだ false のままだ**
+
+**そして、変更を知らせる通知 API も無い。**[744440](https://developer.apple.com/forums/thread/744440) では逆向きの問題 ── **後から許可を取り消されたことをどう知るか** ── が扱われていて、そこでも正式な手段が無いことが確認されている（`CGEventTap` を張ったまま権限を失うと、`tapDisabledByTimeout` が周期的に飛んでくる）。**与えられたことにも、奪われたことにも気づけない。**
 
 しかも**入力監視とアクセシビリティで挙動が違う。**入力監視を許可すると macOS 自身が「終了して再度開く」を出して再起動させるが、**アクセシビリティでは何も出ない**。結果、こうなる。
 
@@ -146,6 +152,8 @@ let bundleId = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
 ```
 
 いま採っている回避策は、**実際にタップを張ってみて、成否で判定する**というものである。**タップの作成は毎回 TCC を引くので、キャッシュの影響を受けない。**
+
+**これは自分で見つけた抜け道ではない。**727984 で Apple の DTS エンジニアが勧めているのが、まさにこの方法である。**公式の見解が「タップを張ってみろ」なのだから、状態を問い合わせる正しい API は無い**ということでもある。
 
 ただしこの回避策にも穴が2つある。
 
