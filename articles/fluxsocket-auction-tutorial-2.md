@@ -3,7 +3,7 @@ title: "ポーリングで自動更新する — そのメリットと限界"
 emoji: "🔄"
 type: "tech"
 topics: ["React", "Express", "JavaScript", "ポーリング"]
-published: false
+published: true
 ---
 
 ## はじめに
