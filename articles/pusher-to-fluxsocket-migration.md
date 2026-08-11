@@ -197,6 +197,7 @@ FluxSocketは現在ベータユーザーを募集しています。Pusherから�
 
 ## 関連記事
 
+- [FluxSocketで作る8つのリアルタイムアプリ — チュートリアル完全ガイド](https://zenn.dev/brainy_software/articles/fluxsocket-tutorial-index)
 - [Pusherの料金問題と、国産WebSocket SaaSを作った理由](https://zenn.dev/brainy_software/articles/pusher-pricing-and-why-fluxsocket)
 - [FluxSocketでリアルタイムチャットを実装する](https://zenn.dev/brainy_software/articles/fluxsocket-chat-tutorial)
 - [WebSocket SaaSを選ぶときに見るべきポイント](https://zenn.dev/brainy_software/articles/websocket-saas-selection-guide)

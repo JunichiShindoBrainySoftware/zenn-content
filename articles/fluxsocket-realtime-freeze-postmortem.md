@@ -241,9 +241,10 @@ WebSocketの接続やイベントの受信は、ライブラリがよくでき�
 この記事で紹介した問題は、WebSocket SaaS側の問題ではなく、クライアント側のDOM更新設計の問題です。Pusher、Socket.io、Ably、FluxSocketなど、どのWebSocket基盤を使っていても同様に起こりえます。
 :::
 
-Brainy Task Boardは現在開発中です。開発の進捗は[X（@BrainySoftware）](https://x.com/BrainySoftware)で発信しています。
+Brainy Task Boardは現在開発中です。開発の進捗は[X（@brainysoftware）](https://x.com/brainysoftware)で発信しています。
 
 ## 関連記事
 
+- [FluxSocketで作る8つのリアルタイムアプリ — チュートリアル完全ガイド](https://zenn.dev/brainy_software/articles/fluxsocket-tutorial-index)
 - [WebSocketとは？HTTP通信との違いと使いどころをわかりやすく解説](https://zenn.dev/brainy_software/articles/websocket-vs-http-realtime)
 - [FluxSocketでリアルタイムチャットを実装する](https://zenn.dev/brainy_software/articles/fluxsocket-chat-tutorial)

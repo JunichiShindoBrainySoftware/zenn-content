@@ -1,16 +1,26 @@
 ---
-title: "【FluxSocket入門】チュートリアルを始める前の準備 — アカウント作成からAPIキー取得まで"
+title: "【FluxSocket 準備編①】アカウント作成から、最初の pub/sub まで"
 emoji: "🔧"
 type: "tech"
 topics: ["FluxSocket", "WebSocket", "リアルタイム通信", "チュートリアル"]
 published: false
 ---
 
+:::message
+**FluxSocket 準備編（全3回）**
+
+1. **アカウント作成から、最初の pub/sub まで** 👈 この記事
+2. チャンネル設計：Public / Private / Presence / Client Events（近日公開）
+3. 認証と本番運用：認証エンドポイント・TLS・トラブルシュート（近日公開）
+
+各回は独立して読めます。まず動かしたいなら本記事だけで「送って受け取る」ところまで到達できます。
+:::
+
 ## このシリーズについて
 
-本シリーズでは、**FluxSocket** を使って 8 つのリアルタイムアプリを構築していきます。チャット、通知、オークション、ダッシュボードなど、実務でよく求められるリアルタイム機能を手を動かしながら学べる構成です。
+**FluxSocket** で作る各種チュートリアル（[完全ガイド](https://zenn.dev/brainy_software/articles/fluxsocket-tutorial-index) を参照）は、共通の「接続の基礎」を前提にしています。この準備編（全3回）で、その基礎を一度だけ固めておきます。
 
-この **第 0 回（準備編）** では、すべてのチュートリアルに共通する FluxSocket のセットアップ手順を解説します。アカウント作成、アプリの作成、API キーの取得、そしてクライアント・サーバー双方の基本的な接続方法までをカバーします。
+第1回のゴールはシンプルです — **アカウントを作り、サーバーから送ったイベントをブラウザで受け取る**。この 1 往復さえ通れば、あとはチャンネルの種類（第2回）や認証・本番運用（第3回）を足していくだけです。
 
 **所要時間: 約 5 分**
 
@@ -18,7 +28,7 @@ published: false
 
 ## 1. FluxSocket とは
 
-FluxSocket は、日本発の **Pusher 互換 WebSocket SaaS** です。Pusher のクライアントライブラリやサーバー SDK がそのまま使えるため、既存の知識やコードを活かしつつ、日本語ドキュメント・日本円決済という利点を得られます。
+FluxSocket は、日本発の **Pusher 互換 WebSocket SaaS** です。Pusher のクライアントライブラリ（`pusher-js`）やサーバー SDK（`pusher-php-server` など）がそのまま使えるため、既存の知識やコードを活かしつつ、日本語ドキュメント・日本円決済という利点を得られます。
 
 公式サイト: [https://fluxsocket.com](https://fluxsocket.com)
 
@@ -36,11 +46,7 @@ FluxSocket は、日本発の **Pusher 互換 WebSocket SaaS** です。Pusher �
 
 登録すると **Hobby プラン（永久無料）** が自動的に適用されます。チュートリアルを進めるにはこのプランで十分です。
 
-:::message
-登録後、確認メールが届きます。メール内のリンクをクリックしてアカウントを有効化してください。
-:::
-
-![登録画面](/images/tutorial/tutorial-register.png)
+> 登録後、確認メールが届きます。メール内のリンクをクリックしてアカウントを有効化してください。
 
 ---
 
@@ -52,11 +58,9 @@ FluxSocket は、日本発の **Pusher 互換 WebSocket SaaS** です。Pusher �
 
 | 項目 | 必須 | 説明 |
 |------|------|------|
-| アプリ名 | はい | 識別しやすい名前を付けます（例: `my-chat-app`） |
+| アプリ名 | はい | 識別しやすい名前を付けます（例: `my-first-app`） |
 | 環境 | はい | 「本番」または「開発テスト」を選択します。チュートリアルでは「開発テスト」を推奨します |
-| クライアントイベント | いいえ | クライアントから直接イベントを送信する場合に有効化します（後から変更可能） |
-
-![アプリ作成](/images/tutorial/tutorial-app-create.png)
+| クライアントイベント | いいえ | クライアントから直接イベントを送信する場合に有効化します（後から変更可能。第2回で扱います） |
 
 ---
 
@@ -69,10 +73,6 @@ FluxSocket は、日本発の **Pusher 互換 WebSocket SaaS** です。Pusher �
 | **App ID** | アプリの識別子 | サーバー側で使用 |
 | **App Key** | クライアント側の接続に使用 | 公開情報（HTML/JS に埋め込み可） |
 | **App Secret** | サーバー側の認証に使用 | **絶対に公開しないでください** |
-
-ダッシュボードには `.env` 形式でコピーできるスニペットが用意されています。ボタン一つでクリップボードにコピーできるので活用してください。
-
-![アプリ詳細](/images/tutorial/tutorial-app-detail.png)
 
 :::message alert
 **App Secret** は秘密鍵です。Git リポジトリにコミットしたり、クライアント側のコードに含めたりしないでください。必ず環境変数で管理しましょう。
@@ -90,9 +90,8 @@ FLUX_APP_KEY=your-app-key
 FLUX_APP_SECRET=your-app-secret
 FLUX_HOST=localhost
 FLUX_PORT=8080
+FLUX_USE_TLS=false
 ```
-
-各変数の説明:
 
 | 変数名 | 説明 |
 |--------|------|
@@ -101,14 +100,15 @@ FLUX_PORT=8080
 | `FLUX_APP_SECRET` | ダッシュボードで確認した App Secret |
 | `FLUX_HOST` | FluxSocket サーバーのホスト名。本番環境では FluxSocket から提供されるホスト名を指定します |
 | `FLUX_PORT` | 接続ポート番号。TLS 使用時は `443` を指定します |
+| `FLUX_USE_TLS` | TLS（wss://）で接続するか。本番は `true`、ローカル開発は `false` |
 
 :::message
-各チュートリアルで `.env.example` を用意しています。`cp .env.example .env` でコピーしてから値を書き換えてください。
+本番の接続先（`ws.fluxsocket.com:443` / TLS）や、`localhost` での開発時の値については **第3回（本番運用）** で詳しく扱います。まずは開発テスト用の値で 1 往復を通しましょう。
 :::
 
 ---
 
-## 6. クライアント側の接続（Pusher.js）
+## 6. クライアント側で受信する（Pusher.js）
 
 FluxSocket は Pusher 互換なので、公式の **Pusher.js** クライアントライブラリがそのまま使えます。
 
@@ -120,60 +120,62 @@ FluxSocket は Pusher 互換なので、公式の **Pusher.js** クライアン�
 
 npm を使う場合は `npm install pusher-js` でもインストールできます。
 
-### 初期化と接続
+### 初期化して購読する
 
 ```javascript
 const pusher = new Pusher('YOUR_APP_KEY', {
-    wsHost: 'your-fluxsocket-host',
-    wsPort: 443,
-    forceTLS: true,
+    wsHost: 'YOUR_FLUX_HOST',
+    wsPort: 8080,
+    forceTLS: false,        // 本番（TLS）では true
     enabledTransports: ['ws'],
-    cluster: 'mt1',
+    cluster: 'mt1',         // FluxSocket では任意。'mt1' を指定
     disableStats: true
 });
 
-// チャンネルを購読してイベントを受信する
-const channel = pusher.subscribe('my-channel');
-channel.bind('my-event', (data) => {
-    console.log('受信:', data);
+// チャンネルを購読して、イベントを待ち受ける
+const channel = pusher.subscribe('hello');
+channel.bind('greeting', (data) => {
+    console.log('受信:', data.message);
 });
 ```
 
-### 設定項目の説明
-
 | パラメータ | 説明 |
 |-----------|------|
-| `wsHost` | FluxSocket サーバーのホスト名を指定します |
+| `wsHost` | FluxSocket サーバーのホスト名 |
 | `wsPort` | WebSocket の接続ポート。TLS 使用時は `443` |
-| `forceTLS` | `true` にすると TLS（wss://）で接続します。本番環境では必ず `true` にしてください |
-| `enabledTransports` | `['ws']` を指定して WebSocket のみを使用します（HTTP フォールバックは不要） |
-| `cluster` | Pusher 互換のため必要ですが、FluxSocket では任意の値で構いません。`'mt1'` を指定してください |
+| `forceTLS` | `true` で TLS（wss://）接続。本番では必ず `true` |
+| `enabledTransports` | `['ws']` を指定して WebSocket のみを使用（HTTP フォールバック不要） |
+| `cluster` | Pusher 互換のため必要ですが、FluxSocket では任意の値で構いません（`'mt1'`） |
 | `disableStats` | `true` にして Pusher の統計送信を無効化します |
+
+これで、`hello` チャンネルの `greeting` イベントを待ち受ける状態になりました。あとはサーバーから送るだけです。
 
 ---
 
-## 7. サーバー側からのイベント送信
+## 7. サーバー側からイベントを送る（trigger）
 
-サーバーからチャンネルにイベントを送信（トリガー）するには、サーバー SDK を使用します。
+FluxSocket は Pusher 互換の HTTP API を持っているので、Pusher のサーバー SDK がそのまま使えます。
 
-### PHP（FluxSocket PHP SDK）
+### PHP（pusher-php-server をそのまま使う）
 
 ```bash
-composer require fluxsocket/fluxsocket-php
+composer require pusher/pusher-php-server
 ```
 
 ```php
-$client = new \FluxSocket\Client([
-    'app_id' => getenv('FLUX_APP_ID'),
-    'key'    => getenv('FLUX_APP_KEY'),
-    'secret' => getenv('FLUX_APP_SECRET'),
-    'host'   => getenv('FLUX_HOST'),
-    'port'   => (int) getenv('FLUX_PORT'),
-    'use_tls' => false,
-]);
+$pusher = new Pusher\Pusher(
+    getenv('FLUX_APP_KEY'),
+    getenv('FLUX_APP_SECRET'),
+    getenv('FLUX_APP_ID'),
+    [
+        'host'   => getenv('FLUX_HOST'),
+        'port'   => (int) getenv('FLUX_PORT'),
+        'useTLS' => getenv('FLUX_USE_TLS') === 'true',
+    ]
+);
 
-$client->trigger('my-channel', 'my-event', [
-    'message' => 'Hello World',
+$pusher->trigger('hello', 'greeting', [
+    'message' => 'Hello FluxSocket!',
 ]);
 ```
 
@@ -192,97 +194,54 @@ const pusher = new Pusher({
     secret: process.env.FLUX_APP_SECRET,
     host: process.env.FLUX_HOST,
     port: process.env.FLUX_PORT,
-    useTLS: false,
+    useTLS: process.env.FLUX_USE_TLS === 'true',
 });
 
-pusher.trigger('my-channel', 'my-event', {
-    message: 'Hello World',
-});
-```
-
-Pusher 互換なので、**既存の Pusher サーバー SDK がそのまま動作します**。接続先のホスト・ポートを FluxSocket に向けるだけで切り替えが完了します。
-
----
-
-## 8. チャンネルの種類
-
-FluxSocket（Pusher 互換）では、用途に応じて 3 種類のチャンネルとクライアントイベントが用意されています。
-
-### Public Channel
-
-プレフィックスなしのチャンネルです。認証不要で、誰でも購読できます。
-
-```javascript
-const channel = pusher.subscribe('news');
-```
-
-チャットルームの公開メッセージや、全体向けの通知などに適しています。
-
-### Private Channel
-
-`private-` プレフィックスを付けたチャンネルです。購読時にサーバー側で認証が行われ、許可されたユーザーのみが購読できます。
-
-```javascript
-const channel = pusher.subscribe('private-user-123');
-```
-
-ユーザー個別の通知や、アクセス制限のあるデータ配信に使います。
-
-### Presence Channel
-
-`presence-` プレフィックスを付けたチャンネルです。Private Channel の機能に加えて、**誰がオンラインか** をリアルタイムに共有できます。
-
-```javascript
-const channel = pusher.subscribe('presence-room-1');
-channel.bind('pusher:member_added', (member) => {
-    console.log(`${member.info.name} が参加しました`);
+pusher.trigger('hello', 'greeting', {
+    message: 'Hello FluxSocket!',
 });
 ```
 
-チャットルームの在室表示や、共同編集のカーソル表示などに最適です。
-
-### Client Events
-
-`client-` プレフィックスを付けたイベントは、サーバーを経由せずにクライアント間で直接送受信できます。Private Channel または Presence Channel 上でのみ使用可能です。
-
-```javascript
-const channel = pusher.subscribe('private-room-1');
-channel.trigger('client-typing', { user: 'Taro' });
-```
-
-タイピングインジケーターやカーソル位置の共有など、低遅延が求められる用途に向いています。
+Pusher 互換なので、接続先のホスト・ポートを FluxSocket に向けるだけで動きます。
 
 :::message
-Client Events を使用するには、ダッシュボードのアプリ設定で「クライアントイベント」を有効にする必要があります。
+FluxSocket には純正のネイティブSDK（PHP は `flux-socket/php-sdk`、JS は `flux-socket-js` など）もあります。本シリーズでは、既存の Pusher 資産や知識をそのまま活かせる**互換ライブラリ（pusher-js / pusher-php-server）**を使う方針で進めます。ゼロから作る場合は純正SDKも選べます。
 :::
 
 ---
 
-## 9. 準備完了！次のステップ
+## 8. 1 往復を通す（動作確認）
 
-ここまでで、FluxSocket を使ったリアルタイムアプリ開発の準備が整いました。
+1. 手順 6 の HTML/JS を開いたブラウザのコンソールを表示しておく
+2. 手順 7 のサーバーコードを実行する
+3. ブラウザのコンソールに `受信: Hello FluxSocket!` が出れば成功
 
-実際に動くデモを確認したい場合は、デモサイトをご覧ください。
+```
+サーバー（trigger）              FluxSocket                ブラウザ（subscribe）
+    |                              |                              |
+    |-- HTTP: greeting ----------->|                              |
+    |    channel: "hello"          |-- WebSocket: greeting ------>|
+    |                              |                              |  console.log('受信: ...')
+```
 
-**デモサイト:** [https://demo.fluxsocket.com](https://demo.fluxsocket.com)
+サーバーは「イベントを送る」だけ、ブラウザは「待ち受ける」だけ。WebSocket の接続管理は FluxSocket が担います。**この 1 往復が、すべてのリアルタイム機能の最小単位**です。
 
-### チュートリアル一覧
+---
 
-以下のチュートリアルを順次公開予定です。興味のあるものから取り組んでいただけます。
+## 次のステップ
 
-| # | タイトル | 技術スタック |
-|---|---------|-------------|
-| 1 | Laravel でリアルタイムチャットを作る | Laravel + Blade |
-| 2 | React でリアルタイムオークションを作る | React + Vite |
-| 3 | Node.js でユーザー別通知を実装する | Express + Vanilla JS |
-| 4 | Vue.js でライブダッシュボードを作る | Vue 3 + Chart.js |
-| 5 | Next.js で共同編集ドキュメントを作る | Next.js + Tiptap |
-| 6 | Vanilla JS でタイピングインジケーターを作る | HTML + JS |
-| 7 | Laravel + React でプレゼンスチャットを作る | Laravel + React |
-| 8 | Node.js でリアルタイム位置情報共有を作る | Express + Leaflet |
+準備は整いました。ここから先は 2 つの方向に広がります。
 
-各チュートリアルは **この準備編が完了していること** を前提としています。
+- **第2回：チャンネル設計** — いま使った `hello` は誰でも購読できる **Public Channel** でした。ユーザー個別に届ける **Private**、在室者が分かる **Presence**、クライアント同士で直接やり取りする **Client Events** を、実例つきで扱います。
+- **第3回：認証と本番運用** — Private / Presence に必要な**認証エンドポイント**の実装、`ws.fluxsocket.com:443` への本番接続、つまずきやすいトラブルの対処。
+
+各チュートリアル（[完全ガイド](https://zenn.dev/brainy_software/articles/fluxsocket-tutorial-index)）は、**この準備編が完了していること**を前提としています。
 
 ---
 
 FluxSocket は現在 **ベータユーザーを募集中** です。Hobby プランは永久無料で、個人開発や学習用途に最適です。ぜひ [fluxsocket.com](https://fluxsocket.com) でアカウントを作成して、リアルタイム通信の世界を体験してみてください。
+
+## 関連記事
+
+- [FluxSocketで作る8つのリアルタイムアプリ — チュートリアル完全ガイド](https://zenn.dev/brainy_software/articles/fluxsocket-tutorial-index)
+- [WebSocketとは？HTTP通信との違いと使いどころをわかりやすく解説](https://zenn.dev/brainy_software/articles/websocket-vs-http-realtime)

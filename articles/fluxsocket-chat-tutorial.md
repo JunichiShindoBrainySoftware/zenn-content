@@ -237,6 +237,8 @@ FluxSocketはPusher互換なので、Laravelの標準的なBroadcasting機能が
 - `.env` のホスト設定を変えるだけでFluxSocketに接続
 - Public/Private/Presenceチャンネル全てに対応
 
+> FluxSocket には純正のネイティブSDK（`flux-socket-js` など）もあります。本記事は「既存の Laravel Broadcasting 資産をそのまま活かす」ことを重視して Pusher 互換の道を採りました。ゼロから作るなら純正SDKも選べます。
+
 :::message
 FluxSocketは現在ベータユーザーを募集しています。無料のHobbyプランで気軽にお試しいただけます。
 👉 [FluxSocket公式サイト](https://fluxsocket.com)
@@ -244,5 +246,6 @@ FluxSocketは現在ベータユーザーを募集しています。無料のHobb
 
 ## 関連記事
 
+- [FluxSocketで作る8つのリアルタイムアプリ — チュートリアル完全ガイド](https://zenn.dev/brainy_software/articles/fluxsocket-tutorial-index)
 - [WebSocketとは？HTTP通信との違いと使いどころをわかりやすく解説](https://zenn.dev/brainy_software/articles/websocket-vs-http-realtime)
 - [PusherからFluxSocketへの移行ガイド](https://zenn.dev/brainy_software/articles/pusher-to-fluxsocket-migration)

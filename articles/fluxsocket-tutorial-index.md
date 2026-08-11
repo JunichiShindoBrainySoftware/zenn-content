@@ -15,6 +15,11 @@ published: true
 **デモサイト:** [https://demo.fluxsocket.com](https://demo.fluxsocket.com)
 全デモを実際に触って動作を確認できます。
 
+### いま読めるもの（先に結論）
+
+- **公開中**：[React × Express でリアルタイムオークション（全3回＋比較記事）](https://zenn.dev/brainy_software/articles/fluxsocket-auction-tutorial-1) ── 手動リロード → ポーリング → WebSocket と段階的に実装し、リアルタイム通信の価値を体感できる。**まずはここから。**
+- **近日公開**：準備編（全3回）と、チャット・通知・タスクボード・ライブフィード・ダッシュボード・カーソル共有・投票の各チュートリアル。
+
 ### 対象読者
 
 - リアルタイム機能を Web アプリに追加したい開発者
@@ -24,12 +29,12 @@ published: true
 ---
 
 :::message
-共通セットアップ手順（準備編）は近日公開予定です。
+各チュートリアルは、共通のセットアップ（アカウント作成・API キー取得・接続設定）が済んでいることを前提にしています。**準備編**は近日公開予定です。
 :::
 
 ## チュートリアル一覧
 
-### 1. Laravel でリアルタイムチャットを作る（全 3 回）
+### 1. Laravel でリアルタイムチャットを作る
 
 | 項目 | 内容 |
 |------|------|
@@ -37,17 +42,13 @@ published: true
 | **FluxSocket 機能** | Public Channel, Server Trigger |
 | **難易度** | ⭐ 入門 |
 
-Laravel の Broadcasting 機能と FluxSocket を組み合わせて、リアルタイムチャットアプリを段階的に構築します。
+Laravel の Broadcasting 機能と FluxSocket を組み合わせて、リアルタイムチャットアプリを構築します。既存の `pusher/pusher-php-server` と `laravel-echo` がそのまま使えます。
 
-| # | タイトル | 状態 |
-|---|---------|------|
-| ① | 環境構築 + 最小チャット | 近日公開 |
-| ② | FluxSocket 連携 + リアルタイム化 | 近日公開 |
-| ③ | 認証・UI 仕上げ + デプロイ | 近日公開 |
+📝 **近日公開**
 
 ---
 
-### 2. React でリアルタイムオークションを作る（全 3 回 + 比較記事）
+### 2. React でリアルタイムオークションを作る（全 3 回 + 比較記事・✅ 公開中）
 
 | 項目 | 内容 |
 |------|------|
@@ -59,14 +60,14 @@ Laravel の Broadcasting 機能と FluxSocket を組み合わせて、リアル�
 
 | # | タイトル | 状態 |
 |---|---------|------|
-| ① | [React + ExpressでオークションWebアプリを作る](https://zenn.dev/brainy_software/articles/fluxsocket-auction-tutorial-1) | 近日公開 |
-| ② | [ポーリングで自動更新する — そのメリットと限界](https://zenn.dev/brainy_software/articles/fluxsocket-auction-tutorial-2) | 近日公開 |
-| ③ | [FluxSocketでリアルタイム化する — 入札が全員に即座に届く](https://zenn.dev/brainy_software/articles/fluxsocket-auction-tutorial-3) | 近日公開 |
-| 比較 | [手動リロード vs ポーリング vs WebSocket — 3つのリアルタイム実装を比較](https://zenn.dev/brainy_software/articles/fluxsocket-auction-comparison) | 近日公開 |
+| ① | [React + ExpressでオークションWebアプリを作る](https://zenn.dev/brainy_software/articles/fluxsocket-auction-tutorial-1) | ✅ 公開中 |
+| ② | [ポーリングで自動更新する — そのメリットと限界](https://zenn.dev/brainy_software/articles/fluxsocket-auction-tutorial-2) | ✅ 公開中 |
+| ③ | [FluxSocketでリアルタイム化する — 入札が全員に即座に届く](https://zenn.dev/brainy_software/articles/fluxsocket-auction-tutorial-3) | ✅ 公開中 |
+| 比較 | [手動リロード vs ポーリング vs WebSocket — 3つのリアルタイム実装を比較](https://zenn.dev/brainy_software/articles/fluxsocket-auction-comparison) | ✅ 公開中 |
 
 ---
 
-### 3. Node.js でユーザー別リアルタイム通知を実装する（全 2 回）
+### 3. Node.js でユーザー別リアルタイム通知を実装する
 
 | 項目 | 内容 |
 |------|------|
@@ -76,14 +77,11 @@ Laravel の Broadcasting 機能と FluxSocket を組み合わせて、リアル�
 
 ユーザーごとに異なる通知をリアルタイムで配信する仕組みを、Private Channel の認証フローとともに解説します。
 
-| # | タイトル | 状態 |
-|---|---------|------|
-| ① | Express API + ユーザー画面 | 近日公開 |
-| ② | Private Channel 認証 + リアルタイム通知 | 近日公開 |
+📝 **近日公開**
 
 ---
 
-### 4. Ruby でコラボタスクボードを作る（全 2 回）
+### 4. Ruby でコラボタスクボードを作る
 
 | 項目 | 内容 |
 |------|------|
@@ -93,10 +91,7 @@ Laravel の Broadcasting 機能と FluxSocket を組み合わせて、リアル�
 
 複数ユーザーが同時にタスクを操作できるコラボレーションボードを構築します。Client Events を使ったサーバーを経由しないリアルタイム通信を学べます。
 
-| # | タイトル | 状態 |
-|---|---------|------|
-| ① | Sinatra + タスク CRUD | 近日公開 |
-| ② | Presence + Client Events + 共同編集 | 近日公開 |
+📝 **近日公開**
 
 ---
 
@@ -162,8 +157,8 @@ Laravel の Broadcasting 機能と FluxSocket を組み合わせて、リアル�
 
 | 機能 | Chat | Auction | Notify | Taskboard | Livefeed | Dashboard | Cursors | Voting |
 |------|:----:|:-------:|:------:|:---------:|:--------:|:---------:|:-------:|:------:|
-| Public Channel | ✅ | | | | ✅ | ✅ | | ✅ |
-| Private Channel | | ✅ | ✅ | | | | | |
+| Public Channel | ✅ | ✅ | | | ✅ | ✅ | | ✅ |
+| Private Channel | | | ✅ | | | | | |
 | Presence Channel | | ✅ | | ✅ | ✅ | | ✅ | |
 | Client Events | | | | ✅ | | | ✅ | |
 | Server Trigger | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | | ✅ |
@@ -184,3 +179,9 @@ FluxSocket は、日本発の **Pusher 互換リアルタイム通信 SaaS** で
 - **ドキュメント:** [https://fluxsocket.com/docs](https://fluxsocket.com/docs)
 
 現在ベータユーザーを募集中です。無料プランもありますので、このチュートリアルシリーズを機にぜひお試しください。
+
+---
+
+## 更新履歴
+
+- **2026-08-12**：オークション編（全3回＋比較記事）の公開にあわせて各記事へのリンクを追加し、チュートリアル一覧を最新の提供状況に更新しました。あわせて冒頭に「いま読めるもの」の要約を追加し、機能カバレッジ表のオークション編の記載（Private Channel → Public Channel）を実際の内容にあわせて訂正しました。準備編（全3回）は近日公開予定です。
