@@ -3,7 +3,7 @@ title: "【正規利用者で見る】VPN・匿名プロキシを弾く ― そ�
 emoji: "🕵️"
 type: "tech"
 topics: ["php", "geoip", "vpn", "セキュリティ"]
-published: false
+published: true
 ---
 
 :::message
