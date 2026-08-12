@@ -443,5 +443,8 @@ FluxSocket は現在ベータユーザーを募集しています。無料の Ho
 
 - [手動リロード vs ポーリング vs WebSocket — オークションアプリで体感する3つのリアルタイム実装](https://zenn.dev/brainy_software/articles/fluxsocket-auction-comparison)
 - [FluxSocket で作る 8 つのリアルタイムアプリ — チュートリアル完全ガイド](https://zenn.dev/brainy_software/articles/fluxsocket-tutorial-index)
-- [FluxSocket でリアルタイムチャットを実装する](https://zenn.dev/brainy_software/articles/fluxsocket-chat-tutorial)
 - [WebSocket とは？HTTP 通信との違いと使いどころをわかりやすく解説](https://zenn.dev/brainy_software/articles/websocket-vs-http-realtime)
+
+## 更新履歴
+
+- **2026-08-13**：関連記事から、未公開の「FluxSocket でリアルタイムチャットを実装する」へのリンクを削除しました（リンク切れになっていたため）。公開時にあらためて掲載します。
