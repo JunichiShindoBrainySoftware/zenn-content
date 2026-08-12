@@ -12,7 +12,7 @@ published: true
 1. [問題編：なぜ“国内判定”はつまずくのか](https://zenn.dev/brainy_software/articles/domestic-ip-allocation-vs-geolocation)
 2. [割り当てで見る：APNIC の割り当てファイルから日本の CIDR を作る](https://zenn.dev/brainy_software/articles/japan-ip-by-apnic-allocation)
 3. **所在で見る：GeoIP で“どこから来たか”を推定する** 👈 この記事
-4. 正規利用者で見る：VPN・匿名プロキシを弾く（近日公開）
+4. [正規利用者で見る：VPN・匿名プロキシを弾く](https://zenn.dev/brainy_software/articles/japan-ip-detect-vpn)
 5. まとめ：目的別の選び方と、パナマIPの答え合わせ（近日公開）
 :::
 
@@ -84,3 +84,7 @@ GeoIP は**推定**なので、外れる。とくに次のケース：
 次は三つ目の視点、**「正規利用者か」**。所在で日本と出ても、VPN や匿名プロキシを弾きたい場面はある。その実装（ASN や匿名IP DB での検出）と、私のIPが**VPN として見抜かれるのか**を確かめる。答え合わせ③へ。
 
 > あなたの「国内判定」は、割り当て・所在・正規利用者のどれで見ていますか？ よければコメント欄や X（[@brainysoftware](https://x.com/brainysoftware)）で聞かせてください。
+
+## 更新履歴
+
+- **2026-08-13**：第4話の公開にあわせて、冒頭の連載目次からリンクを追加しました（第5話は近日公開）。
