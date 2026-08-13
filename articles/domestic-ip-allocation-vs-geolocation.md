@@ -13,7 +13,7 @@ published: true
 2. [割り当てで見る：APNIC の割り当てファイルから日本の CIDR を作る](https://zenn.dev/brainy_software/articles/japan-ip-by-apnic-allocation)
 3. [所在で見る：GeoIP で“どこから来たか”を推定する](https://zenn.dev/brainy_software/articles/japan-ip-by-geoip)
 4. [正規利用者で見る：VPN・匿名プロキシを弾く](https://zenn.dev/brainy_software/articles/japan-ip-detect-vpn)
-5. まとめ：目的別の選び方と、パナマIPの答え合わせ（近日公開）
+5. [まとめ：目的別の選び方と、パナマIPの答え合わせ](https://zenn.dev/brainy_software/articles/japan-ip-check-summary)
 :::
 
 ## 自社サイトに、自分が弾かれた
@@ -75,3 +75,4 @@ published: true
 ## 更新履歴
 
 - **2026-08-13**：第2話・第3話・第4話の公開にあわせて、冒頭の連載目次から各記事へのリンクを追加しました（第5話は近日公開）。
+- **2026-08-14**：連載完結にあわせて、冒頭の連載目次に第5話へのリンクを追加しました。

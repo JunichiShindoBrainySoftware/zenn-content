@@ -13,7 +13,7 @@ published: true
 2. [割り当てで見る：APNIC の割り当てファイルから日本の CIDR を作る](https://zenn.dev/brainy_software/articles/japan-ip-by-apnic-allocation)
 3. **所在で見る：GeoIP で“どこから来たか”を推定する** 👈 この記事
 4. [正規利用者で見る：VPN・匿名プロキシを弾く](https://zenn.dev/brainy_software/articles/japan-ip-detect-vpn)
-5. まとめ：目的別の選び方と、パナマIPの答え合わせ（近日公開）
+5. [まとめ：目的別の選び方と、パナマIPの答え合わせ](https://zenn.dev/brainy_software/articles/japan-ip-check-summary)
 :::
 
 [前回（第2話）](https://zenn.dev/brainy_software/articles/japan-ip-by-apnic-allocation)、割り当てベースは私を弾いた——戸籍がパナマだから。でも私は日本にいて、日本のサーバーから出ている。今回は視点を変えて、**「所在」で判定する**。
@@ -88,3 +88,4 @@ GeoIP は**推定**なので、外れる。とくに次のケース：
 ## 更新履歴
 
 - **2026-08-13**：第4話の公開にあわせて、冒頭の連載目次からリンクを追加しました（第5話は近日公開）。
+- **2026-08-14**：連載完結にあわせて、冒頭の連載目次に第5話へのリンクを追加しました。

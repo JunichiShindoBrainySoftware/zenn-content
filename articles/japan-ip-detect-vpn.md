@@ -13,7 +13,7 @@ published: true
 2. [割り当てで見る：APNIC の割り当てファイルから日本の CIDR を作る](https://zenn.dev/brainy_software/articles/japan-ip-by-apnic-allocation)
 3. [所在で見る：GeoIP で“どこから来たか”を推定する](https://zenn.dev/brainy_software/articles/japan-ip-by-geoip)
 4. **正規利用者で見る：VPN・匿名プロキシを弾く** 👈 この記事
-5. まとめ：目的別の選び方と、パナマIPの答え合わせ（近日公開）
+5. [まとめ：目的別の選び方と、パナマIPの答え合わせ](https://zenn.dev/brainy_software/articles/japan-ip-check-summary)
 :::
 
 [前回（第3話）](https://zenn.dev/brainy_software/articles/japan-ip-by-geoip)、所在（GeoIP）では私のIPは「日本」と出た。割り当てでは弾かれた私が、所在では通る。だが——「日本と出れば通す」でいいとは限らない。**VPN 越しのアクセスを弾きたい**場面がある（不正対策、地域限定コンテンツ、規制対応）。今回は三つ目の視点、**「正規利用者か」**を見る。
@@ -94,3 +94,7 @@ $denyKeywords[] = 'PacketHub';   // ← 実際に食らってから足した
 三方式で結果はバラバラ。**じゃあ、結局どれを使えばいいのか？** 最終回は、目的別（法規制・不正対策・配信・課金）の選び方を整理し、私のパナマIPの**答え合わせを総括**する。第1話の問い「あなたなら、このIPを“国内”と判定しますか？」に、実装から決着をつける。
 
 > あなたなら VPN 経由の日本サーバー出口を「国内」として通しますか、弾きますか？ よければコメント欄や X（[@brainysoftware](https://x.com/brainysoftware)）で。
+
+## 更新履歴
+
+- **2026-08-14**：連載完結にあわせて、冒頭の連載目次に第5話へのリンクを追加しました。
