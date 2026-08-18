@@ -3,7 +3,7 @@ title: "WebSocket通知5件でフリーズ、15件でクラッシュした話 �
 emoji: "🧊"
 type: "tech"
 topics: ["FluxSocket", "WebSocket", "パフォーマンス", "JavaScript", "リアルタイム"]
-published: false
+published: true
 ---
 
 開発中のタスク管理ツール **Brainy Task Board** が、通知を5件同時に受け取っただけでフリーズしました。15件同時削除ではタブごとクラッシュ。原因の調査と対処に丸一日かかったので、同じ地雷を踏まないための記録を残しておきます。
@@ -247,4 +247,3 @@ Brainy Task Boardは現在開発中です。開発の進捗は[X（@brainysoftwa
 
 - [FluxSocketで作る8つのリアルタイムアプリ — チュートリアル完全ガイド](https://zenn.dev/brainy_software/articles/fluxsocket-tutorial-index)
 - [WebSocketとは？HTTP通信との違いと使いどころをわかりやすく解説](https://zenn.dev/brainy_software/articles/websocket-vs-http-realtime)
-- [FluxSocketでリアルタイムチャットを実装する](https://zenn.dev/brainy_software/articles/fluxsocket-chat-tutorial)
