@@ -59,7 +59,7 @@ FluxSocket は、日本発の **Pusher 互換 WebSocket SaaS** です。Pusher �
 | 項目 | 必須 | 説明 |
 |------|------|------|
 | アプリ名 | はい | 識別しやすい名前を付けます（例: `my-first-app`） |
-| 環境 | はい | 「本番」または「開発テスト」を選択します。チュートリアルでは「開発テスト」を推奨します |
+| 環境 | はい | 「本番環境」または「開発・テスト」を選択します。チュートリアルでは、デバッグ機能が有効になる「開発・テスト」を推奨します |
 | クライアントイベント | いいえ | クライアントから直接イベントを送信する場合に有効化します（後から変更可能。第2回で扱います） |
 
 ---
@@ -88,9 +88,9 @@ FluxSocket は、日本発の **Pusher 互換 WebSocket SaaS** です。Pusher �
 FLUX_APP_ID=your-app-id
 FLUX_APP_KEY=your-app-key
 FLUX_APP_SECRET=your-app-secret
-FLUX_HOST=localhost
-FLUX_PORT=8080
-FLUX_USE_TLS=false
+FLUX_HOST=ws.fluxsocket.com
+FLUX_PORT=443
+FLUX_USE_TLS=true
 ```
 
 | 変数名 | 説明 |
@@ -98,12 +98,16 @@ FLUX_USE_TLS=false
 | `FLUX_APP_ID` | ダッシュボードで確認した App ID |
 | `FLUX_APP_KEY` | ダッシュボードで確認した App Key |
 | `FLUX_APP_SECRET` | ダッシュボードで確認した App Secret |
-| `FLUX_HOST` | FluxSocket サーバーのホスト名。本番環境では FluxSocket から提供されるホスト名を指定します |
-| `FLUX_PORT` | 接続ポート番号。TLS 使用時は `443` を指定します |
-| `FLUX_USE_TLS` | TLS（wss://）で接続するか。本番は `true`、ローカル開発は `false` |
+| `FLUX_HOST` | FluxSocket の WebSocket ホスト名。`ws.fluxsocket.com` です |
+| `FLUX_PORT` | 接続ポート番号。`443` です |
+| `FLUX_USE_TLS` | TLS（wss://）で接続するか。`true` です |
 
 :::message
-本番の接続先（`ws.fluxsocket.com:443` / TLS）や、`localhost` での開発時の値については **第3回（本番運用）** で詳しく扱います。まずは開発テスト用の値で 1 往復を通しましょう。
+**接続先は、手順 3 で選んだ環境（本番 / 開発・テスト）にかかわらず同じ** `ws.fluxsocket.com:443`（TLS）です。環境の選択はデバッグ機能の有無を切り替えるもので、接続先は変わりません。ダッシュボードのアプリ詳細画面にも同じ値が表示されます。
+:::
+
+:::message
+ダッシュボードのアプリ詳細画面には、`FLUXSOCKET_APP_ID` のように **`FLUXSOCKET_` 始まり**のスニペットが表示されます。本シリーズでは短い `FLUX_` を使っていますが、指すものは同じです。画面からコピーした場合は変数名を読み替えてください（`FLUXSOCKET_SCHEME=https` が `FLUX_USE_TLS=true` に対応します）。
 :::
 
 ---
@@ -124,9 +128,10 @@ npm を使う場合は `npm install pusher-js` でもインストールできま
 
 ```javascript
 const pusher = new Pusher('YOUR_APP_KEY', {
-    wsHost: 'YOUR_FLUX_HOST',
-    wsPort: 8080,
-    forceTLS: false,        // 本番（TLS）では true
+    wsHost: 'ws.fluxsocket.com',
+    wsPort: 443,
+    wssPort: 443,
+    forceTLS: true,
     enabledTransports: ['ws'],
     cluster: 'mt1',         // FluxSocket では任意。'mt1' を指定
     disableStats: true
@@ -141,9 +146,10 @@ channel.bind('greeting', (data) => {
 
 | パラメータ | 説明 |
 |-----------|------|
-| `wsHost` | FluxSocket サーバーのホスト名 |
-| `wsPort` | WebSocket の接続ポート。TLS 使用時は `443` |
-| `forceTLS` | `true` で TLS（wss://）接続。本番では必ず `true` |
+| `wsHost` | FluxSocket の WebSocket ホスト名（`ws.fluxsocket.com`） |
+| `wsPort` | 非 TLS 時の接続ポート |
+| `wssPort` | **TLS 時の接続ポート。`forceTLS: true` ではこちらが使われます**（指定漏れに注意） |
+| `forceTLS` | `true` で TLS（wss://）接続。FluxSocket は TLS のみです |
 | `enabledTransports` | `['ws']` を指定して WebSocket のみを使用（HTTP フォールバック不要） |
 | `cluster` | Pusher 互換のため必要ですが、FluxSocket では任意の値で構いません（`'mt1'`） |
 | `disableStats` | `true` にして Pusher の統計送信を無効化します |
@@ -193,7 +199,7 @@ const pusher = new Pusher({
     key: process.env.FLUX_APP_KEY,
     secret: process.env.FLUX_APP_SECRET,
     host: process.env.FLUX_HOST,
-    port: process.env.FLUX_PORT,
+    port: parseInt(process.env.FLUX_PORT, 10),
     useTLS: process.env.FLUX_USE_TLS === 'true',
 });
 
@@ -233,7 +239,7 @@ FluxSocket には純正のネイティブSDK（PHP は `flux-socket/php-sdk`、J
 準備は整いました。ここから先は 2 つの方向に広がります。
 
 - **第2回：チャンネル設計** — いま使った `hello` は誰でも購読できる **Public Channel** でした。ユーザー個別に届ける **Private**、在室者が分かる **Presence**、クライアント同士で直接やり取りする **Client Events** を、実例つきで扱います。
-- **第3回：認証と本番運用** — Private / Presence に必要な**認証エンドポイント**の実装、`ws.fluxsocket.com:443` への本番接続、つまずきやすいトラブルの対処。
+- **第3回：認証と本番運用** — Private / Presence に必要な**認証エンドポイント**の実装、TLS まわりの詳細、つまずきやすいトラブルの対処。
 
 各チュートリアル（[完全ガイド](https://zenn.dev/brainy_software/articles/fluxsocket-tutorial-index)）は、**この準備編が完了していること**を前提としています。
 
