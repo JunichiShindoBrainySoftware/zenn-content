@@ -245,7 +245,9 @@ FluxSocket には純正のネイティブSDK（PHP は `flux-socket/php-sdk`、J
 
 ---
 
-FluxSocket は現在 **ベータユーザーを募集中** です。Hobby プランは永久無料で、個人開発や学習用途に最適です。ぜひ [fluxsocket.com](https://fluxsocket.com) でアカウントを作成して、リアルタイム通信の世界を体験してみてください。
+ここまで通せた方へ ── FluxSocket は現在 **ベータユーザーを募集中** です。実際に動かしてみて詰まった点や、欲しい機能があれば、X（[@brainysoftware](https://x.com/brainysoftware)）で教えてください。開発に直接反映します。
+
+Hobby プランは永久無料なので、このまま試し続けていただけます。
 
 ## 関連記事
 
